@@ -1,0 +1,514 @@
+:root {
+  --metal-dark: #0b111c;
+  --metal-mid: #162234;
+  --metal-light: #24354f;
+  --metal-border: #314868;
+  --screen-bg: #040b14;
+  --cyan: #00e5ff;
+  --cyan-glow: rgba(0, 229, 255, 0.55);
+  --amber: #ff7b00;
+  --amber-bright: #ffaa2b;
+  --amber-glow: rgba(255, 123, 0, 0.6);
+  --danger: #ff2a54;
+  --green: #00e676;
+  --text-main: #e4f2ff;
+  --text-dim: #7da0c4;
+  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, #app {
+  background: #03060c;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* ==========================================================================
+   BARRA SUPERIOR DO CAPACETE (<header>)
+   ========================================================================== */
+header {
+  height: 50px;
+  background: linear-gradient(180deg, rgba(8, 15, 28, 0.96), rgba(12, 22, 38, 0.88));
+  border-bottom: 1px solid rgba(0, 229, 255, 0.35);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+}
+
+header strong {
+  background: linear-gradient(135deg, #ff3e00, #ff8800);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 5px;
+  letter-spacing: 0.8px;
+}
+
+header span {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--cyan);
+  font-size: 0.92rem;
+}
+
+/* ==========================================================================
+   ESTRUTURA DA CABINE (<main>) — Reage ao --impulso em puro CSS
+   ========================================================================== */
+main {
+  --impulso: 25;
+  --star-speed: calc(4.2s - (var(--impulso) * 0.074s));
+  --sway-speed: calc(4.2s - (var(--impulso) * 0.06s));
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(4, 8, 16, 0.25) 0%, rgba(7, 12, 22, 0.82) 32%, rgba(8, 14, 24, 0.92) 100%),
+    url('/cockpit-front-bg.jpg') center top / cover no-repeat;
+  animation: cockpitSway var(--sway-speed) ease-in-out infinite alternate;
+}
+
+main.dobra {
+  --star-speed: 0.22s;
+  --sway-speed: 0.45s;
+}
+
+@keyframes cockpitSway {
+  from { transform: translate3d(-1.5px, -1px, 0) rotate(-0.18deg); }
+  to   { transform: translate3d(1.5px, 1px, 0) rotate(0.18deg); }
+}
+
+/* ==========================================================================
+   1. TETO E PARA-BRISA ESPACIAL COM ESTRELAS QUE ACELERAM NO CSS (.teto)
+   ========================================================================== */
+.teto {
+  position: relative;
+  height: 19vh;
+  min-height: 118px;
+  max-height: 175px;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(2, 10, 24, 0.55) 0%, rgba(2, 6, 14, 0.9) 100%),
+    url('/cockpit-front-bg.jpg') center 18% / cover no-repeat;
+  overflow: hidden;
+  border-bottom: 2px solid #0a1422;
+}
+
+/* Camada 1 de estrelas brilhantes cuja velocidade depende de --star-speed */
+.teto::before,
+.teto::after {
+  content: '';
+  position: absolute;
+  inset: -100% 0 0 0;
+  background-image:
+    radial-gradient(2.5px 2.5px at 6% 18%, #ffffff 90%, transparent),
+    radial-gradient(3px 3px at 14% 72%, #00e5ff 90%, transparent),
+    radial-gradient(2px 2px at 23% 35%, #ffffff 90%, transparent),
+    radial-gradient(3px 3px at 34% 82%, #ffaa2b 90%, transparent),
+    radial-gradient(2.5px 2.5px at 45% 22%, #ffffff 90%, transparent),
+    radial-gradient(3px 3px at 56% 64%, #00e5ff 90%, transparent),
+    radial-gradient(2px 2px at 67% 28%, #ffffff 90%, transparent),
+    radial-gradient(3px 3px at 78% 76%, #ffffff 90%, transparent),
+    radial-gradient(2.5px 2.5px at 88% 40%, #00e5ff 90%, transparent),
+    radial-gradient(2px 2px at 94% 85%, #ffffff 90%, transparent);
+  background-size: 420px 140px;
+  filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 8px #00e5ff);
+  pointer-events: none;
+  z-index: 1;
+  animation: estrelasVoando var(--star-speed) linear infinite;
+}
+
+/* Camada 2 de estrelas em profundidade diferente (mais rápida) */
+.teto::after {
+  background-size: 290px 110px;
+  background-position: 120px 45px;
+  opacity: calc(0.35 + (var(--impulso) * 0.013));
+  animation: estrelasVoando calc(var(--star-speed) * 0.65) linear infinite;
+}
+
+/* Quando o Motor de Dobra liga, as estrelas esticam virando rastros de luz */
+main.dobra .teto::before,
+main.dobra .teto::after {
+  filter: drop-shadow(0 8px 6px #00e5ff) drop-shadow(0 -8px 6px #ffffff);
+}
+
+@keyframes estrelasVoando {
+  from { transform: translateY(0); }
+  to   { transform: translateY(50%); }
+}
+
+.teto p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  background: rgba(4, 12, 24, 0.82);
+  border: 1px solid rgba(0, 229, 255, 0.45);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.25);
+  padding: 5px 18px;
+  border-radius: 12px;
+  z-index: 3;
+}
+
+/* ==========================================================================
+   2. BANCADA DOS 3 MONITORES (.monitores > article)
+   ========================================================================== */
+.monitores {
+  flex: 1;
+  background: linear-gradient(180deg, #172336 0%, #0f1826 60%, #19273c 100%);
+  padding: 12px 28px;
+  border-top: 2px solid #2e486d;
+  border-bottom: 3px solid #090e17;
+  box-shadow: inset 0 10px 25px rgba(0, 0, 0, 0.7);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.monitores > article {
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0, 55, 90, 0.42) 0%, rgba(3, 9, 18, 0.96) 85%),
+    repeating-linear-gradient(0deg, rgba(0, 229, 255, 0.03) 0px, rgba(0, 229, 255, 0.03) 1px, transparent 1px, transparent 3px);
+  border: 2px solid rgba(0, 229, 255, 0.45);
+   outline: 6px solid #101928;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow:
+    inset 0 0 24px rgba(0, 229, 255, 0.15),
+    0 6px 16px rgba(0, 0, 0, 0.7);
+  font-family: var(--font-mono);
+  min-height: 0;
+}
+
+article h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--cyan);
+  border-bottom: 1px solid rgba(0, 229, 255, 0.25);
+  padding-bottom: 5px;
+  margin-bottom: 6px;
+}
+
+article h2 code {
+  color: var(--amber-bright);
+  font-family: var(--font-mono);
+}
+
+/* Listas de Dados e Memória nos Monitores 1 e 2 (ul / li) */
+.monitores ul {
+  list-style: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  background: rgba(0, 18, 34, 0.65);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.monitores li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  padding: 2px 0;
+}
+
+.monitores li span { color: var(--text-dim); }
+.monitores li strong { color: #fff; }
+
+/* Formulário do Monitor 3 (form / label / input / button) */
+.monitores form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.72rem;
+}
+
+.monitores form label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.monitores form input {
+  width: 150px;
+  background: #060c16;
+  border: 1px solid var(--cyan);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.monitores form button {
+  width: 100%;
+  background: rgba(255, 123, 0, 0.2);
+  border: 1px solid rgba(255, 123, 0, 0.65);
+  color: #ffd199;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 6px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.monitores form button:hover {
+  background: rgba(255, 123, 0, 0.38);
+  color: #fff;
+}
+
+.monitores form p {
+  color: var(--amber-bright);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+/* ==========================================================================
+   3. MESA DE COMANDO INFERIOR EM PERSPECTIVA 3D (.mesa > article)
+   ========================================================================== */
+.mesa {
+  height: 31vh;
+  min-height: 205px;
+  max-height: 260px;
+  perspective: 900px;
+  background: linear-gradient(180deg, #0b111c 0%, #141f31 100%);
+  padding: 0 28px 10px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 1.1fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.mesa > article {
+  background: linear-gradient(180deg, #1b293e 0%, #101927 100%);
+  border: 2px solid #31496b;
+  border-top: 3px solid #496b9a;
+  border-radius: 12px 12px 6px 6px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: rotateX(10deg);
+  transform-origin: bottom center;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.85),
+    inset 0 2px 12px rgba(255, 136, 0, 0.08);
+}
+
+.mesa > article h2 {
+  color: var(--amber-bright);
+  border-bottom-color: rgba(255, 136, 0, 0.25);
+}
+
+.mesa > article h2 code {
+  color: var(--cyan);
+}
+
+/* Sliders da Mesa Esquerda (label + input[type="range"]) */
+.mesa label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.mesa label span {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-main);
+}
+
+.mesa label strong {
+  color: var(--cyan);
+  font-family: var(--font-mono);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 9px;
+  background: #070d17;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid #fff;
+  background: var(--amber-bright);
+  box-shadow: 0 0 12px var(--amber);
+  cursor: grab;
+}
+
+input[type="range"].cyan::-webkit-slider-thumb {
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
+}
+
+/* Fileiras de Botões 3D na Mesa Central (nav > button) */
+.mesa nav {
+  display: flex;
+  gap: 10px;
+}
+
+.mesa nav button {
+  flex: 1;
+  height: 44px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 900;
+  cursor: pointer;
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.8);
+  transition: transform 0.12s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+button.amber {
+  background: url('/btn-amber-3d.jpg') center / cover no-repeat;
+  border: 1.5px solid rgba(255, 170, 43, 0.75);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.85), 0 0 14px rgba(255, 123, 0, 0.45);
+}
+
+button.cyan {
+  background: url('/btn-cyan-3d.jpg') center / cover no-repeat;
+  border: 1.5px solid rgba(0, 229, 255, 0.75);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.85), 0 0 14px rgba(0, 229, 255, 0.45);
+}
+
+.mesa nav button:hover {
+  filter: brightness(1.18);
+  transform: translateY(-2px);
+}
+
+.mesa nav button:active {
+  transform: translateY(2px) scale(0.97);
+}
+
+/* Mesa Direita: Luzes ({#each}), Alerta ({#if}) e Velocímetros (style:transform) */
+.luzes {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px 14px;
+  background: rgba(10, 16, 26, 0.85);
+  border: 1px solid rgba(255, 123, 0, 0.35);
+  border-radius: 8px;
+}
+
+.luzes span {
+  width: 12px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--amber-bright);
+  box-shadow: 0 0 10px var(--amber), 0 0 18px var(--amber);
+}
+
+.alerta {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(0, 230, 118, 0.16);
+  border: 1px solid var(--green);
+  color: var(--green);
+  text-align: center;
+}
+
+.alerta.sobrecarga {
+  background: rgba(255, 42, 84, 0.2);
+  border-color: var(--danger);
+  color: #ff94a8;
+}
+
+.velocimetros {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.velocimetros figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.disco {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: url('/knob-3d.jpg') center / 116% no-repeat;
+  border: 2px solid rgba(0, 229, 255, 0.65);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.92),
+    0 0 12px rgba(0, 229, 255, 0.35),
+    inset 0 0 6px rgba(0, 0, 0, 0.8);
+  transition: transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.disco.amber {
+  border-color: rgba(255, 170, 43, 0.75);
+  filter: hue-rotate(195deg) saturate(1.35);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.92),
+    0 0 12px rgba(255, 123, 0, 0.4);
+}
+
+.velocimetros figcaption {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #bcd2ec;
+  text-shadow: 0 1px 3px #000;
+}
